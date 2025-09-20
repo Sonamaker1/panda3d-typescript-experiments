@@ -8,7 +8,6 @@
 extern "C" {
 #endif
 
-// Forward decl
 typedef struct ArgBuffer ArgBuffer;
 
 // Creation / destruction
@@ -34,8 +33,30 @@ void argbuffer_push_f32(ArgBuffer* buf, float v);
 void argbuffer_push_f64(ArgBuffer* buf, double v);
 void argbuffer_push_bool(ArgBuffer* buf, bool v);
 void argbuffer_push_char(ArgBuffer* buf, char v);
-void argbuffer_push_napi_env(ArgBuffer* buf, void* v);
-void argbuffer_push_napi_value(ArgBuffer* buf, void* v);
+//~ void argbuffer_push_napi_env(ArgBuffer* buf, void* v);
+//~ void argbuffer_push_napi_value(ArgBuffer* buf, void* v);
+
+// Get functions (mirrors push)
+char* argbuffer_get_buffer(ArgBuffer* buf, int idx);
+const char* argbuffer_get_cstring(ArgBuffer* buf, int idx);
+void* argbuffer_get_function(ArgBuffer* buf, int idx);
+void* argbuffer_get_ptr(ArgBuffer* buf, int idx);
+int8_t argbuffer_get_i8(ArgBuffer* buf, int idx);
+int16_t argbuffer_get_i16(ArgBuffer* buf, int idx);
+int32_t argbuffer_get_i32(ArgBuffer* buf, int idx);
+int64_t argbuffer_get_i64(ArgBuffer* buf, int idx);
+int64_t argbuffer_get_i64_fast(ArgBuffer* buf, int idx);
+uint8_t argbuffer_get_u8(ArgBuffer* buf, int idx);
+uint16_t argbuffer_get_u16(ArgBuffer* buf, int idx);
+uint32_t argbuffer_get_u32(ArgBuffer* buf, int idx);
+uint64_t argbuffer_get_u64(ArgBuffer* buf, int idx);
+uint64_t argbuffer_get_u64_fast(ArgBuffer* buf, int idx);
+float argbuffer_get_f32(ArgBuffer* buf, int idx);
+double argbuffer_get_f64(ArgBuffer* buf, int idx);
+bool argbuffer_get_bool(ArgBuffer* buf, int idx);
+char argbuffer_get_char(ArgBuffer* buf, int idx);
+//~ void* argbuffer_get_napi_env(ArgBuffer* buf, int idx);
+//~ void* argbuffer_get_napi_value(ArgBuffer* buf, int idx);
 
 // Accessors
 int argbuffer_argc(ArgBuffer* buf);

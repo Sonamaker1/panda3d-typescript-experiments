@@ -22,8 +22,8 @@ struct ArgEntry {
         ARG_F64,
         ARG_BOOL,
         ARG_CHAR,
-        ARG_NAPI_ENV,
-        ARG_NAPI_VALUE
+        //~ ARG_NAPI_ENV,
+        //~ ARG_NAPI_VALUE
     } type;
 
     union {
@@ -43,8 +43,8 @@ struct ArgEntry {
         double f64;
         bool b;
         char c;
-        void* napi_env;
-        void* napi_value;
+        //~ void* napi_env;
+        //~ void* napi_value;
     } value;
 };
 
@@ -96,15 +96,50 @@ DEF_PUSH(f32, F32, "f32", float, f32)
 DEF_PUSH(f64, F64, "f64", double, f64)
 DEF_PUSH(bool, BOOL, "bool", bool, b)
 DEF_PUSH(char, CHAR, "char", char, c)
-DEF_PUSH(napi_env, NAPI_ENV, "napi_env", void*, napi_env)
-DEF_PUSH(napi_value, NAPI_VALUE, "napi_value", void*, napi_value)
+//~ DEF_PUSH(napi_env, NAPI_ENV, "napi_env", void*, napi_env)
+//~ DEF_PUSH(napi_value, NAPI_VALUE, "napi_value", void*, napi_value)
 
 #undef DEF_PUSH
+// --------------------------------------
+
+
+// ---- AUTO-GENERATED GET FUNCTIONS ----
+#define DEF_GET(NAME, FIELD, TYPE, VAL)                  \
+    TYPE argbuffer_get_##NAME(ArgBuffer* buf, int idx) { \
+        if (idx < 0 || idx >= (int)buf->args.size()) return (TYPE)0; \
+        ArgEntry& e = buf->args[idx];                    \
+        return e.value.VAL;                              \
+    }
+
+DEF_GET(buffer, BUFFER, char*, buffer)
+DEF_GET(cstring, CSTRING, const char*, cstring)
+DEF_GET(function, FUNCTION, void*, function)
+DEF_GET(ptr, PTR, void*, ptr)
+DEF_GET(i8, I8, int8_t, i8)
+DEF_GET(i16, I16, int16_t, i16)
+DEF_GET(i32, I32, int32_t, i32)
+DEF_GET(i64, I64, int64_t, i64)
+DEF_GET(i64_fast, I64_FAST, int64_t, i64)
+DEF_GET(u8, U8, uint8_t, u8)
+DEF_GET(u16, U16, uint16_t, u16)
+DEF_GET(u32, U32, uint32_t, u32)
+DEF_GET(u64, U64, uint64_t, u64)
+DEF_GET(u64_fast, U64_FAST, uint64_t, u64)
+DEF_GET(f32, F32, float, f32)
+DEF_GET(f64, F64, double, f64)
+DEF_GET(bool, BOOL, bool, b)
+DEF_GET(char, CHAR, char, c)
+//~ DEF_GET(napi_env, NAPI_ENV, void*, napi_env)
+//~ DEF_GET(napi_value, NAPI_VALUE, void*, napi_value)
+
+#undef DEF_GET
 // --------------------------------------
 
 int argbuffer_argc(ArgBuffer* buf) {
     return (int)buf->args.size();
 }
+
+
 
 void** argbuffer_as_void_array(ArgBuffer* buf) {
     static std::vector<void*> scratch;

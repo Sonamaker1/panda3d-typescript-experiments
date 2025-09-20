@@ -81,6 +81,68 @@ export const panda = dlopen(sdkPath, {
     "args": [FFIType.char],
     "returns": FFIType.void
   },
+  
+  "get_cstring": {
+    "args": [FFIType.i32],
+    "returns": FFIType.cstring
+  },
+  "get_function": {
+    "args": [FFIType.i32],
+    "returns": FFIType.function
+  },
+  "get_ptr": {
+    "args": [FFIType.i32],
+    "returns": FFIType.ptr
+  },
+  "get_i8": {
+    "args": [FFIType.i32],
+    "returns": FFIType.i8
+  },
+  "get_i16": {
+    "args": [FFIType.i32],
+    "returns": FFIType.i16
+  },
+  "get_i32": {
+    "args": [FFIType.i32],
+    "returns": FFIType.i32
+  },
+  "get_i64": {
+    "args": [FFIType.i32],
+    "returns": FFIType.i64
+  },
+  "get_u8": {
+    "args": [FFIType.i32],
+    "returns": FFIType.u8
+  },
+  "get_u16": {
+    "args": [FFIType.i32],
+    "returns": FFIType.u16
+  },
+  "get_u32": {
+    "args": [FFIType.i32],
+    "returns": FFIType.u32
+  },
+  "get_u64": {
+    "args": [FFIType.i32],
+    "returns": FFIType.u64
+  },
+  "get_f32": {
+    "args": [FFIType.i32],
+    "returns": FFIType.f32
+  },
+  "get_f64": {
+    "args": [FFIType.i32],
+    "returns": FFIType.f64
+  },
+  "get_bool": {
+    "args": [FFIType.i32],
+    "returns": FFIType.bool
+  },
+  "get_char": {
+    "args": [FFIType.i32],
+    "returns": FFIType.char
+  },
+  
   "argc": {
     "args": [],
     "returns": FFIType.i32
