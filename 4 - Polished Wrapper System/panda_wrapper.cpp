@@ -75,8 +75,17 @@ extern "C" {
 
         REGISTER_FUNC(get_background_type, g_framework.get_background_type, int);
         REGISTER_FUNC(get_num_windows, g_framework.get_num_windows, int);
-
-        load_prc_file_data("", "load-display pandagl");
+        
+        registry["load_prc_file_data"] = [](void** args, int argc) -> void* {
+            if (argc != 2) {
+                std::cerr << "set_window_title expects 2 arguments\n";
+                return nullptr;
+            }
+            load_prc_file_data(std::string(argbuffer_get_cstring(buf, 0)), std::string(argbuffer_get_cstring(buf, 1)));
+            return nullptr;
+        };
+        
+        //~ load_prc_file_data("", "load-display pandagl");
     }
 
     // Call by string name

@@ -20,6 +20,12 @@ async function main() {
     reset_buffer();
     
     init_registry();
+    
+    push_cstring("")
+    push_cstring("load-display pandagl")
+    call_func("load_prc_file_data");
+    reset_buffer();
+    
     call_func("open_framework");
     push_cstring("this works but it's kinda dumb");
     console.log(types())
@@ -27,9 +33,10 @@ async function main() {
     call_func("set_window_title");
     reset_buffer();
     call_func("open_window");
-    
     reset_buffer();
     
+
+
     
     call_func("main_loop");
     call_func("close_framework");
