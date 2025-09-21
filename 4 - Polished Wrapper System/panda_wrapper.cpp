@@ -29,28 +29,56 @@ static ArgBuffer* returnBuf =  argbuffer_create();
 static PandaFramework g_framework;  // global instance
 
 // Dispatcher signature
-using Dispatcher = std::function<void*(void** args, int argc)>;
+using Dispatcher = std::function<void*(ArgBuffer* args, int argc)>;
 
 // Registry mapping string -> dispatcher
 static std::unordered_map<std::string, Dispatcher> registry;
 
 // For functions returning something
 #define REGISTER_FUNC(name, callable, rettype, ...) \
-    registry[#name] = [](void** args, int argc) -> void* { \
+    registry[#name] = [](ArgBuffer* args, int argc) -> void* { \
         rettype result = (callable)(__VA_ARGS__); \
         return new rettype(result); \
     };
 
 // For void-returning functions
 #define REGISTER_VOID_FUNC(name, callable, ...) \
-    registry[#name] = [](void** args, int argc) -> void* { \
+    registry[#name] = [](ArgBuffer* args, int argc) -> void* { \
         (callable)(__VA_ARGS__); \
         return nullptr; \
     };
+    
+#define REGISTER(name, expected) \
+    registry[name] = [](ArgBuffer* args, int argc) -> void* { \
+        if (argc != expected) { \
+            std::cerr << name << " expects " << expected << " arguments\n"; \
+            return nullptr; \
+        }
 
+#define END_REGISTER return nullptr; \
+        };
 extern "C" {
 
     void init_registry() {
+        
+        // Argument type tokens
+        #define b_bool     1
+        #define b_char     2
+        #define b_cstring  argbuffer_get_cstring
+        #define b_f32      4
+        #define b_f64      5
+        #define b_function 6
+        #define b_i8       7
+        #define b_i16      8
+        #define b_i32      9
+        #define b_i64      10
+        #define b_ptr      11
+        #define b_u8       12
+        #define b_u16      13
+        #define b_u32      14
+        #define b_u64      15
+
+
         REGISTER_FUNC(all_windows_closed, g_framework.all_windows_closed, bool);
         REGISTER_VOID_FUNC(clear_exit_flag, g_framework.clear_exit_flag);
         REGISTER_VOID_FUNC(clear_highlight, g_framework.clear_highlight);
@@ -58,17 +86,10 @@ extern "C" {
         REGISTER_VOID_FUNC(close_framework, g_framework.close_framework);
         REGISTER_VOID_FUNC(open_framework, g_framework.open_framework);
         REGISTER_FUNC(open_window, g_framework.open_window, WindowFramework*);
-        registry["set_window_title"] = [](void** args, int argc) -> void* {
-            if (argc != 1) {
-                std::cerr << "set_window_title expects 1 argument\n";
-                return nullptr;
-            }
-            //~ auto str = static_cast<const char*>(args[0]); // assume passed as cstring
-            //~ g_framework.set_window_title(std::string(str));
-            const char * str = argbuffer_get_cstring(buf, 0);
-            g_framework.set_window_title(std::string(str));
-            return nullptr;
-        };
+        
+        REGISTER("set_window_title", 1)
+            g_framework.set_window_title(std::string(b_cstring(args, 0)));
+        END_REGISTER
 
         REGISTER_VOID_FUNC(enable_default_keys, g_framework.enable_default_keys);
         REGISTER_VOID_FUNC(main_loop, g_framework.main_loop);
@@ -76,14 +97,10 @@ extern "C" {
         REGISTER_FUNC(get_background_type, g_framework.get_background_type, int);
         REGISTER_FUNC(get_num_windows, g_framework.get_num_windows, int);
         
-        registry["load_prc_file_data"] = [](void** args, int argc) -> void* {
-            if (argc != 2) {
-                std::cerr << "set_window_title expects 2 arguments\n";
-                return nullptr;
-            }
-            load_prc_file_data(std::string(argbuffer_get_cstring(buf, 0)), std::string(argbuffer_get_cstring(buf, 1)));
-            return nullptr;
-        };
+        REGISTER("load_prc_file_data", 2)
+            load_prc_file_data(std::string(b_cstring(args, 0)), std::string(b_cstring(args, 1)));
+        END_REGISTER
+    
         
         //~ load_prc_file_data("", "load-display pandagl");
     }
@@ -92,7 +109,7 @@ extern "C" {
     void* call_func(const char* name) {
         auto it = registry.find(name);
         if (it != registry.end()) {
-            return it->second(argbuffer_as_void_array(buf), argbuffer_argc(buf));
+            return it->second(buf, argbuffer_argc(buf));
         } else {
             std::cerr << "No such function: " << name << "\n";
             return nullptr;
