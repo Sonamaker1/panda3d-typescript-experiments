@@ -23,21 +23,15 @@ async function main() {
     
     push_cstring("")
     push_cstring("load-display pandagl")
-    call_func("load_prc_file_data");
-    reset_buffer();
-    
+    call_func_r("load_prc_file_data");
+
     call_func("open_framework");
     push_cstring("this works but it's kinda dumb");
     console.log(types())
     console.log(get_cstring(0))
-    call_func("set_window_title");
-    reset_buffer();
+    call_func_r("set_window_title");
     call_func("open_window");
-    reset_buffer();
-    
 
-
-    
     call_func("main_loop");
     call_func("close_framework");
     
@@ -49,6 +43,11 @@ function push_cstring(str){
 
 function call_func(str){
     panda.symbols.call_func(toCStringBuff(str));
+}
+
+function call_func_r(str){
+    panda.symbols.call_func(toCStringBuff(str));
+    reset_buffer();
 }
 
 const get_cstring = panda.symbols.get_cstring;
