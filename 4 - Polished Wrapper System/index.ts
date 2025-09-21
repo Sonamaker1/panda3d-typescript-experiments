@@ -21,14 +21,15 @@ async function main() {
     
     init_registry();
     call_func("open_framework");
-    call_func("open_window");
-    
-    reset_buffer();
     push_cstring("this works but it's kinda dumb");
     console.log(types())
     console.log(get_cstring(0))
     call_func("set_window_title");
     reset_buffer();
+    call_func("open_window");
+    
+    reset_buffer();
+    
     
     call_func("main_loop");
     call_func("close_framework");

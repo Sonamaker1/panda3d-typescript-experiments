@@ -58,6 +58,17 @@ extern "C" {
         REGISTER_VOID_FUNC(close_framework, g_framework.close_framework);
         REGISTER_VOID_FUNC(open_framework, g_framework.open_framework);
         REGISTER_FUNC(open_window, g_framework.open_window, WindowFramework*);
+        registry["set_window_title"] = [](void** args, int argc) -> void* {
+            if (argc != 1) {
+                std::cerr << "set_window_title expects 1 argument\n";
+                return nullptr;
+            }
+            //~ auto str = static_cast<const char*>(args[0]); // assume passed as cstring
+            //~ g_framework.set_window_title(std::string(str));
+            const char * str = argbuffer_get_cstring(buf, 0);
+            g_framework.set_window_title(std::string(str));
+            return nullptr;
+        };
 
         REGISTER_VOID_FUNC(enable_default_keys, g_framework.enable_default_keys);
         REGISTER_VOID_FUNC(main_loop, g_framework.main_loop);
