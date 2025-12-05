@@ -1,0 +1,1 @@
+g++ -fPIC -shared panda_wrapper.cpp -o libpanda_wrapper.so -I /home/tony/Documents/GitHub/panda3d/built/include/ -L /home/tony/Documents/GitHub/panda3d/built/lib/ -lp3framework -lpanda -lpandaexpress -lp3dtoolconfig -lp3dtool

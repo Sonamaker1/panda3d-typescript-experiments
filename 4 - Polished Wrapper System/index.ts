@@ -2,20 +2,22 @@ import { CString } from "bun:ffi";
 import panda from "./panda";
 
 async function main() {
-    reset_buffer();
     
     init_registry();
+
+    reset_buffer();
 
     load_prc_file_data("","load-display pandagl");
 
     open_framework();
     set_window_title("this works and it's getting better");
+    //panda.symbols.push_cstring(get_version_string());
+
+    //call_panda("set_window_title");
     open_window();
 
     main_loop();
     close_framework();
-    
-    
 }
 
 function toCStringBuff(str){
@@ -27,6 +29,9 @@ function push_cstring(str){
     panda.symbols.push_cstring(toCStringBuff(str));
 }
 
+function call_panda(str){
+    panda.symbols.call_func(toCStringBuff(str));
+}
 const init_registry = panda.symbols.init_registry;
 const reset_buffer = panda.symbols.buf_reset_destroy;
 
@@ -36,6 +41,14 @@ const open_window = defineFunc("open_window", []);
 const main_loop = defineFunc("main_loop", []);
 const open_framework = defineFunc("open_framework", []);
 const close_framework = defineFunc("close_framework", []);
+
+const get_version_string = defineFunc("get_version_string", []);
+const get_distributor = defineFunc("get_distributor", []);
+const get_compiler = defineFunc("get_compiler", []);
+const get_build_date = defineFunc("get_build_date", []);
+const get_platform = defineFunc("get_platform", []);
+
+
 
 // Type hint enum
 type TypeHint = "bool" | "i32" | "f64" | "cstring" | "ptr";

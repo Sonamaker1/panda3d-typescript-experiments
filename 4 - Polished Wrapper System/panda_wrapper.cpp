@@ -30,13 +30,22 @@ static PandaFramework g_framework;  // global instance
 
 // Dispatcher signature
 using Dispatcher = std::function<void*(ArgBuffer* args, int argc)>;
+using DispatcherSTRING = std::function<void*(ArgBuffer* args, int argc)>;
 
 // Registry mapping string -> dispatcher
 static std::unordered_map<std::string, Dispatcher> registry;
+static std::unordered_map_string_functions<std::string, DispatcherSTRING> registrySTRING;
 
 // For functions returning something
 #define REGISTER_FUNC(name, callable, rettype, ...) \
     registry[#name] = [](ArgBuffer* args, int argc) -> void* { \
+        rettype result = (callable)(__VA_ARGS__); \
+        return new rettype(result); \
+    };
+
+// For functions returning std::string
+#define REGISTER_STRING(name, callable, rettype, ...) \
+    registrySTRING[#name] = [](ArgBuffer* args, int argc) -> std::string { \
         rettype result = (callable)(__VA_ARGS__); \
         return new rettype(result); \
     };
@@ -62,22 +71,28 @@ extern "C" {
     void init_registry() {
         
         // Argument type tokens
-        #define b_bool     1
-        #define b_char     2
+        #define b_bool     argbuffer_get_bool
+        #define b_char     argbuffer_get_char
         #define b_cstring  argbuffer_get_cstring
-        #define b_f32      4
-        #define b_f64      5
-        #define b_function 6
-        #define b_i8       7
-        #define b_i16      8
-        #define b_i32      9
-        #define b_i64      10
-        #define b_ptr      11
-        #define b_u8       12
-        #define b_u16      13
-        #define b_u32      14
-        #define b_u64      15
+        #define b_f32      argbuffer_get_f32
+        #define b_f64      argbuffer_get_f64
+        #define b_function argbuffer_get_function
+        #define b_i8       argbuffer_get_i8
+        #define b_i16      argbuffer_get_i16
+        #define b_i32      argbuffer_get_i32
+        #define b_i64      argbuffer_get_i64
+        #define b_ptr      argbuffer_get_ptr
+        #define b_u8       argbuffer_get_u8 
+        #define b_u16      argbuffer_get_u16
+        #define b_u32      argbuffer_get_u32
+        #define b_u64      argbuffer_get_u64
 
+        REGISTER_STRING(get_version_string, PandaSystem::get_global_ptr()->get_version_string, std::string);
+        REGISTER_STRING(get_distributor, PandaSystem::get_global_ptr()->get_distributor, std::string);
+        REGISTER_STRING(get_compiler, PandaSystem::get_global_ptr()->get_compiler, std::string);
+        REGISTER_STRING(get_build_date, PandaSystem::get_global_ptr()->get_build_date, std::string);
+        REGISTER_STRING(get_git_commit, PandaSystem::get_global_ptr()->get_git_commit, std::string);
+        REGISTER_STRING(get_platform, PandaSystem::get_global_ptr()->get_platform, std::string);
 
         REGISTER_FUNC(all_windows_closed, g_framework.all_windows_closed, bool);
         REGISTER_VOID_FUNC(clear_exit_flag, g_framework.clear_exit_flag);
@@ -253,6 +268,17 @@ extern "C" {
 
     char get_char(int v) {
         return argbuffer_get_char(buf, v);
+    }
+
+    std::string get_string(const char * c) {
+        auto it = registry.find(c);
+        if (it != registry.end()) {
+            return it->second(buf, argbuffer_argc(buf));
+        } else {
+            std::cerr << "No such function: " << c << "\n";
+            return nullptr;
+        }
+        return nullptr;
     }
 
     int argc() {
